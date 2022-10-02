@@ -18,24 +18,45 @@ class _CalendarViewState extends State<CalendarView> {
       appBar: AppBar(
         title: Text(
           DateFormat('yyyy年 M月').format(now),
-          style: TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.black),
         ),
         elevation: 0,
         backgroundColor: Colors.orange,
       ),
-      body: Container(
-        height: 30,
-        color: Colors.white,
-        child: Row(
-          children: weekName
-              .map((e) => Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Text(e),
-                    ),
-                  ))
-              .toList(),
-        ),
+      body: Column(
+        children: [
+          Container(
+            height: 30,
+            color: Colors.white,
+            child: Row(
+              children: weekName
+                  .map((e) => Expanded(
+                        child: Container(
+                          alignment: Alignment.center,
+                          child: Text(e),
+                        ),
+                      ))
+                  .toList(),
+            ),
+          ),
+          const _CalenderItem(),
+        ],
+      ),
+    );
+  }
+}
+
+class _CalenderItem extends StatelessWidget {
+  const _CalenderItem({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: const Text('1'),
+      height: 80,
+      width: 50,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.orangeAccent),
       ),
     );
   }
