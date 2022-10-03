@@ -39,24 +39,57 @@ class _CalendarViewState extends State<CalendarView> {
                   .toList(),
             ),
           ),
-          const _CalenderItem(),
+          createCalenderItem(),
         ],
       ),
+    );
+  }
+
+  Widget createCalenderItem() {
+    List<Widget> _list = [];
+    List<Widget> _listCache = [];
+
+    // 今月の最後の日の取得(来月の1日から1日引いた日)
+    int monthLastDay = DateTime(now.year, now.month + 1, 1)
+        .subtract(const Duration(days: 1))
+        .day;
+
+    for (int i = 0; i < monthLastDay; i++) {
+      _listCache.add(_CalenderItem(day: i + 1));
+      if (i % 7 == 6) {
+        _list.add(Row(
+          children: _listCache,
+        ));
+        _listCache = [];
+      } else if (i == monthLastDay - 1) {
+        int repeatNumber = 7 - _listCache.length;
+        _listCache.addAll(List.generate(
+            repeatNumber, (index) => Expanded(child: Container())));
+        _list.add(Row(
+          children: _listCache,
+        ));
+      }
+    }
+
+    return Column(
+      children: _list,
     );
   }
 }
 
 class _CalenderItem extends StatelessWidget {
-  const _CalenderItem({Key? key}) : super(key: key);
+  final int day;
+  const _CalenderItem({required this.day, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: const Text('1'),
-      height: 80,
-      width: 50,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.orangeAccent),
+    return Expanded(
+      child: Container(
+        child: Text('$day'),
+        height: 80,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.orangeAccent),
+        ),
       ),
     );
   }
