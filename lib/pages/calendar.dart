@@ -54,15 +54,25 @@ class _CalendarViewState extends State<CalendarView> {
         .subtract(const Duration(days: 1))
         .day;
 
+    // 今月の1日の取得
+    DateTime date = DateTime(now.year, now.month, 1);
+
     for (int i = 0; i < monthLastDay; i++) {
       _listCache.add(_CalenderItem(day: i + 1));
-      if (i % 7 == 6) {
+      int repeatNumber = 7 - _listCache.length;
+      // 日付が日曜の場合、下に改行する。
+      if (date.add(Duration(days: i)).weekday == 7) {
+        if (i < 7) {
+          _listCache.insertAll(
+              0,
+              List.generate(
+                  repeatNumber, (index) => Expanded(child: Container())));
+        }
         _list.add(Row(
           children: _listCache,
         ));
         _listCache = [];
       } else if (i == monthLastDay - 1) {
-        int repeatNumber = 7 - _listCache.length;
         _listCache.addAll(List.generate(
             repeatNumber, (index) => Expanded(child: Container())));
         _list.add(Row(
@@ -85,7 +95,14 @@ class _CalenderItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        child: Text('$day'),
+        alignment: Alignment.topCenter,
+        child: Container(
+          width: 20,
+          height: 20,
+          alignment: Alignment.center,
+          // color: Colors.orangeAccent,
+          child: Text('$day'),
+        ),
         height: 80,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.orangeAccent),
