@@ -39,60 +39,77 @@ class _CalendarViewState extends State<CalendarView> {
                   .toList(),
             ),
           ),
-          createCalenderItem(),
+          Expanded(child: createCalenderItem()),
         ],
       ),
     );
   }
 
   Widget createCalenderItem() {
-    List<Widget> _list = [];
-    List<Widget> _listCache = [];
+    return PageView.builder(itemBuilder: (context, index) {
+      List<Widget> _list = [];
+      List<Widget> _listCache = [];
 
-    // 今月の最後の日の取得(来月の1日から1日引いた日)
-    int monthLastDay = DateTime(now.year, now.month + 1, 1)
-        .subtract(const Duration(days: 1))
-        .day;
+      // 今月の最後の日の取得(来月の1日から1日引いた日)
+      int monthLastDay = DateTime(now.year, now.month + 1, 1)
+          .subtract(const Duration(days: 1))
+          .day;
 
-    // 今月の1日の取得
-    DateTime date = DateTime(now.year, now.month, 1);
+      // 今月の1日の取得
+      DateTime date = DateTime(now.year, now.month, 1);
 
-    for (int i = 0; i < monthLastDay; i++) {
-      _listCache.add(_CalenderItem(day: i + 1));
-      int repeatNumber = 7 - _listCache.length;
-      // 日付が日曜の場合、下に改行する。
-      if (date.add(Duration(days: i)).weekday == 7) {
-        if (i < 7) {
-          _listCache.insertAll(
-              0,
-              List.generate(
-                  repeatNumber, (index) => Expanded(child: Container())));
+      for (int i = 0; i < monthLastDay; i++) {
+        _listCache.add(_CalenderItem(
+          day: i + 1,
+          now: now,
+          cacheDate: DateTime(now.year, now.month, i + 1),
+        ));
+        int repeatNumber = 7 - _listCache.length;
+        // 日付が日曜の場合、下に改行する。
+        if (date.add(Duration(days: i)).weekday == 7) {
+          if (i < 7) {
+            _listCache.insertAll(
+                0,
+                List.generate(
+                    repeatNumber, (index) => Expanded(child: Container())));
+          }
+          _list.add(Expanded(
+            child: Row(
+              children: _listCache,
+            ),
+          ));
+          _listCache = [];
+        } else if (i == monthLastDay - 1) {
+          _listCache.addAll(List.generate(
+              repeatNumber, (index) => Expanded(child: Container())));
+          _list.add(Expanded(
+            child: Row(
+              children: _listCache,
+            ),
+          ));
         }
-        _list.add(Row(
-          children: _listCache,
-        ));
-        _listCache = [];
-      } else if (i == monthLastDay - 1) {
-        _listCache.addAll(List.generate(
-            repeatNumber, (index) => Expanded(child: Container())));
-        _list.add(Row(
-          children: _listCache,
-        ));
       }
-    }
 
-    return Column(
-      children: _list,
-    );
+      return Column(
+        children: _list,
+      );
+    });
   }
 }
 
 class _CalenderItem extends StatelessWidget {
   final int day;
-  const _CalenderItem({required this.day, Key? key}) : super(key: key);
+  final DateTime now;
+  final DateTime cacheDate;
+  const _CalenderItem(
+      {required this.day, required this.now, required this.cacheDate, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // 今日かどうかの判定
+    bool isToday =
+        (now.difference(cacheDate).inDays == 0) && (now.day == cacheDate.day);
     return Expanded(
       child: Container(
         alignment: Alignment.topCenter,
@@ -100,12 +117,13 @@ class _CalenderItem extends StatelessWidget {
           width: 20,
           height: 20,
           alignment: Alignment.center,
-          // color: Colors.orangeAccent,
+          color: isToday ? Colors.orangeAccent : null,
           child: Text('$day'),
         ),
-        height: 80,
+        height: 100,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.orangeAccent),
+          borderRadius: BorderRadius.circular(5),
         ),
       ),
     );
